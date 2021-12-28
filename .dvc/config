@@ -1,0 +1,8 @@
+[core]
+    remote = storage
+['remote "myremote"']
+    url = s3://felipefrmelo-udacity/data/
+['remote "aws"']
+    url = s3://felipefrmelo-udacity/data/
+['remote "storage"']
+    url = s3://felipefrmelo-udacity/data/
