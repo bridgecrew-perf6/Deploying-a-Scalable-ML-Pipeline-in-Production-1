@@ -1,9 +1,10 @@
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
-
+from sklearn.preprocessing import MinMaxScaler
 
 def process_data(
-    X, categorical_features=[], label=None, training=True, encoder=None, lb=None
+    X, categorical_features=[], label=None, training=True, encoder=None, lb=None,
+    scaler=None
 ):
     """ Process the data used in the machine learning pipeline.
 
@@ -44,15 +45,20 @@ def process_data(
         passed in.
     """
 
-    if label is not None:
+    if label:
         y = X[label]
         X = X.drop([label], axis=1)
     else:
         y = np.array([])
 
     X_categorical = X[categorical_features].values
-    X_continuous = X.drop(*[categorical_features], axis=1)
+    skewed = ['capital-gain', 'capital-loss']
+    X_continuous = X.drop(categorical_features, axis=1)
+    X_continuous = X_continuous[skewed].apply(lambda x: np.log(x + 1))
 
+    scaler = MinMaxScaler()
+
+    X_continuous = scaler.fit_transform(X_continuous)
     if training is True:
         encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
         lb = LabelBinarizer()
