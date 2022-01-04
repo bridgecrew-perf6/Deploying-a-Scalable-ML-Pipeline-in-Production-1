@@ -1,7 +1,7 @@
-from re import S
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
+import os
+import pickle
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -66,3 +66,25 @@ def inference(model, X):
 
 
 
+def save_model(model, encoder, lb):
+    with open(os.path.join("model", "model.pkl"), "wb") as f:
+        pickle.dump(model, f)
+
+    with open(os.path.join("model", "encoder.pkl"), "wb") as f:
+        pickle.dump(encoder, f)
+
+    with open(os.path.join("model", "lb.pkl"), "wb") as f:
+        pickle.dump(lb, f)
+
+
+def load_model():
+    with open(os.path.join("model", "model.pkl"), "rb") as f:
+        model = pickle.load(f)
+
+    with open(os.path.join("model", "encoder.pkl"), "rb") as f:
+        encoder = pickle.load(f)
+
+    with open(os.path.join("model", "lb.pkl"), "rb") as f:
+        lb = pickle.load(f)
+
+    return model, encoder, lb
