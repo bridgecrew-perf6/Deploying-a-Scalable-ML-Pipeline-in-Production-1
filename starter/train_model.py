@@ -1,14 +1,15 @@
 # Script to train machine learning model.
 
+from pickle import load
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from starter.ml.data import process_data
+from starter.ml.data import process_data, load_data
 from starter.ml.model import inference, save_model, train_model, compute_model_metrics
 import os
 # Add the necessary imports for the starter code.
 
 # Add code to load in the data.
-data = pd.read_csv(os.path.join("data", "cleaned_data.csv"), index_col=0)
+data = load_data()
 
 
 # Optional enhancement, use K-fold cross validation instead of a train-test split.
@@ -48,6 +49,18 @@ def main():
     print(f"Precision: {precision}")
     print(f"Recall: {recall}")
     print(f"F1: {fbeta}")
+
+    dataframe = pd.DataFrame(columns=["feature", "value", "precision", "recall", "fbeta_score"])
+    for feature in cat_features:
+        for value in data[feature].unique():
+            slice_data = data[data[feature] == value]
+            X_test, y_test, encoder, lb = process_data(
+                slice_data, categorical_features=cat_features, label="salary", training=False, encoder=encoder, lb=lb
+            )
+            y_pred = inference(model, X_test)
+            precision, recall, fbeta = compute_model_metrics(y_test, y_pred)
+            dataframe = dataframe.append({"feature": feature, "value":value, "precision": precision, "recall": recall, "fbeta_score": fbeta}, ignore_index = True)
+    dataframe.to_csv(os.path.join("data", "slice_output.csv"),index=False)
 
 
 if __name__ == "__main__":
