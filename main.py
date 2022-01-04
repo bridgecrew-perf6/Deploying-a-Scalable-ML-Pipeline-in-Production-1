@@ -33,6 +33,26 @@ class Person(BaseModel):
     hours_per_week: int = Field(alias='hours-per-week')
     native_country: str = Field(alias='native-country')
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "age": 31,
+                "workclass": "Private",
+                "fnlgt": 15781,
+                "education": "Masters",
+                "education-num": 14,
+                "marital-status": "Married-civ-spouse",
+                "occupation": "Prof-specialty",
+                "relationship": "Not-in-family",
+                "race": "White",
+                "sex": "Male",
+                "capital-gain": 1020,
+                "capital-loss": 0,
+                "hours-per-week": 50,
+                "native-country": "United-States"
+            }
+        }
+
 
 class Predict(BaseModel):
     prediction: str
@@ -42,8 +62,8 @@ class Predict(BaseModel):
         if isinstance(v, str):
             return v
         return 'Salary > 50k' if v == 1 else 'Salary <= 50k'
-        
-       
+
+
 # Define a GET on the specified endpoint.
 @app.get("/")
 async def health():
