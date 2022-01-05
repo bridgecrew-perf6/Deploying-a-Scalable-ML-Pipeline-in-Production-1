@@ -1,6 +1,5 @@
 # Script to train machine learning model.
 
-from pickle import load
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from starter.ml.data import process_data, load_data
