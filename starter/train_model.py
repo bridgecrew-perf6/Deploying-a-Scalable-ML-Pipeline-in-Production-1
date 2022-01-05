@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 from starter.ml.data import process_data, load_data
 from starter.ml.model import inference, save_model, train_model, compute_model_metrics
 import os
+import argparse
+
 # Add the necessary imports for the starter code.
 
 # Add code to load in the data.
@@ -29,7 +31,7 @@ cat_features = [
 # Train and save a model.
 
 
-def main():
+def main(args):
     X_train, y_train, encoder, lb = process_data(
         train, categorical_features=cat_features, label="salary", training=True
     )
@@ -50,18 +52,29 @@ def main():
     print(f"Recall: {recall}")
     print(f"F1: {fbeta}")
 
-    dataframe = pd.DataFrame(columns=["feature", "value", "precision", "recall", "fbeta_score"])
-    for feature in cat_features:
-        for value in data[feature].unique():
-            slice_data = data[data[feature] == value]
-            X_test, y_test, encoder, lb = process_data(
-                slice_data, categorical_features=cat_features, label="salary", training=False, encoder=encoder, lb=lb
-            )
-            y_pred = inference(model, X_test)
-            precision, recall, fbeta = compute_model_metrics(y_test, y_pred)
-            dataframe = dataframe.append({"feature": feature, "value":value, "precision": precision, "recall": recall, "fbeta_score": fbeta}, ignore_index = True)
-    dataframe.to_csv(os.path.join("data", "slice_output.csv"),index=False)
+    slice_feature_data(model, encoder, lb,  args.feature)
+
+
+def slice_feature_data(model, encoder, lb, feature):
+    dataframe = pd.DataFrame(
+        columns=["feature", "value", "precision", "recall", "fbeta_score"])
+    for value in data[feature].unique():
+        slice_data = data[data[feature] == value]
+        X_test, y_test, encoder, lb = process_data(
+            slice_data, categorical_features=cat_features, label="salary", training=False, encoder=encoder, lb=lb
+        )
+        y_pred = inference(model, X_test)
+        precision, recall, fbeta = compute_model_metrics(y_test, y_pred)
+        dataframe = dataframe.append({"feature": feature, "value": value, "precision": precision,
+                                     "recall": recall, "fbeta_score": fbeta}, ignore_index=True)
+    dataframe.to_csv(os.path.join("data", "slice_output.csv"), index=False)
 
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description='Feature for slice data.')
+    parser.add_argument('--feature', type=str,
+                        help='Feature to slice.', default='education')
+    args = parser.parse_args()
+
+    main(args)
