@@ -22,4 +22,5 @@ response = requests.post(
     json=data
 )
 
-print(response.json())
+print('status code:', response.status_code)
+print('response:', response.json())
